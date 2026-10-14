@@ -17,7 +17,7 @@ logger = logging.getLogger("churn_api")
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = Path(os.getenv(
     "MODEL_PATH",
-    str(BASE_DIR.parent.parent / "artifacts" / "churnguard_pipeline.joblib"),
+    str(BASE_DIR.parent.parent.parent.parent / "churnguard_pipeline.joblib"),
 ))
 
 # Feature order taken from the supplied notebook's training code.
