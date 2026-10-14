@@ -2,79 +2,80 @@ Customer Churn Prediction System
 
 1. Project Overview
 
-The Customer Churn Prediction System is a Machine Learning project that predicts whether a customer is likely to leave a telecommunications service.
+The Customer Churn Prediction System is an end-to-end Machine Learning project that predicts whether a telecommunications customer is likely to leave the service.
 
-The project uses customer information, subscription details, and usage behavior to identify customers who may be at risk of churn.
+The project analyzes customer subscription details, usage behavior, and demographic information to identify customers who may be at risk of churn.
 
-It includes a trained Machine Learning model, a FastAPI backend for predictions, and a Streamlit interface for user interaction.
+It includes data exploration, preprocessing, feature engineering, model training, hyperparameter tuning, model evaluation, a FastAPI backend, and a Streamlit interface.
 
 2. Project Objectives
 
-* Analyze customer data and identify patterns related to churn.
-* Perform data cleaning and preprocessing.
-* Engineer useful features to improve prediction.
-* Train and evaluate multiple Machine Learning models.
-* Handle class imbalance and evaluate model performance.
-* Provide predictions through a simple interactive interface.
+* Explore customer data and identify patterns associated with churn.
+* Clean and preprocess the dataset.
+* Engineer useful features for prediction.
+* Train and compare multiple Machine Learning models.
+* Tune the selected model using cross-validation.
+* Evaluate performance using metrics suitable for imbalanced classification.
+* Save the trained model for reuse.
+* Provide predictions through a FastAPI endpoint and an interactive Streamlit interface.
 
 3. Dataset
 
 The dataset contains customer subscription, usage, demographic, and churn information.
 
-Original dataset:
-
-* Number of records: 3,150
-* Number of columns: 14
+* Original records: 3,150
+* Original columns: 14
 * Target variable: Churn
-* Class distribution: 495 churned customers and 2,655 non-churned customers.
+* Churned customers: 495
+* Non-churned customers: 2,655
+* Churn rate: approximately 15.71%
 
-The dataset contains an imbalanced target, with approximately 15.71% of customers belonging to the churn class.
+The dataset has an imbalanced target distribution, so accuracy alone is not sufficient to evaluate the model.
 
 4. Data Preprocessing and Feature Engineering
 
-The preprocessing workflow includes:
+The workflow includes:
 
-* Exploring the dataset and analyzing feature distributions.
+* Exploring feature distributions and relationships.
 * Checking missing values and duplicate records.
 * Removing duplicate records.
-* Handling conflicting records with identical features but different target labels.
-* Analyzing relationships between customer behavior and churn.
+* Handling records with identical feature values but conflicting target labels.
 * Creating the Avg_Usage_Duration feature:
 
 Avg_Usage_Duration = Seconds of Use / (Frequency of use + 1)
 
-* Splitting the data into training and testing sets while preserving the target class distribution.
+* Splitting the data into training and testing sets using stratification.
 
 After preprocessing, 2,822 records were retained.
 
 5. Machine Learning Models
 
-Several models were evaluated during experimentation, including:
+Three classification models were evaluated:
 
 * Logistic Regression
 * Random Forest
 * Gradient Boosting
 
-Random Forest was selected for the final model after comparing performance and tuning hyperparameters.
+Random Forest was selected after model comparison and hyperparameter tuning.
 
-The final model excludes the Status feature to avoid relying on a potentially problematic or overly predictive feature.
+The Status feature was excluded from the final model to avoid relying on a potentially problematic or overly predictive feature.
 
 Hyperparameter tuning was performed using RandomizedSearchCV with stratified cross-validation.
 
-The selected hyperparameters were:
+Selected Hyperparameters
 
-* n_estimators = 300
-* max_depth = 30
-* min_samples_split = 5
-* min_samples_leaf = 2
-* max_features = 'sqrt'
+* n_estimators: 300
+* max_depth: 30
+* min_samples_split: 5
+* min_samples_leaf: 2
+* max_features: sqrt
 
 6. Final Model Evaluation
 
 The final model was evaluated on a held-out test set.
 
 Metric	Result
-Accuracy	Approximately 94.87%
+Accuracy	94.87%
 Precision	83.53%
 Recall	82.56%
 F1-score	83.04%
@@ -82,17 +83,15 @@ PR-AUC	91.33%
 
 Confusion Matrix
 
-	Predicted No Churn	Predicted Churn
+Actual / Predicted	No Churn	Churn
 Actual No Churn	465	14
 Actual Churn	15	71
 
-The model correctly identified 71 churned customers out of 86 actual churn cases in the test set.
+The model correctly identified 71 of the 86 customers who churned in the test set.
 
-Precision, recall, and F1-score are included because accuracy alone may not adequately describe performance on an imbalanced dataset.
+Precision, recall, F1-score, and PR-AUC provide additional insight into performance on the imbalanced dataset.
 
 7. System Architecture
-
-The project consists of three main components:
 
 Jupyter Notebook
 
@@ -100,11 +99,11 @@ Used for data exploration, preprocessing, feature engineering, model training, h
 
 FastAPI Backend
 
-Loads the saved model, validates customer inputs, calculates the engineered feature, and returns prediction results.
+Loads the trained model, validates customer inputs, calculates the engineered feature, and returns churn predictions and estimated churn probabilities.
 
 Streamlit Frontend
 
-Provides an interactive form where users enter customer information and view the predicted churn class and estimated churn probability.
+Provides an interactive form for entering customer information and viewing prediction results.
 
 8. Technologies Used
 
@@ -116,36 +115,42 @@ Provides an interactive form where users enter customer information and view the
 * Scikit-learn
 * Joblib
 * FastAPI
+* Uvicorn
 * Streamlit
 * Requests
 * Jupyter Notebook
 
 9. Project Structure
 
-final pro/
+The repository contains the dataset, notebook, saved model, and API application.
+
+customer-churn-prediction-system/
+├── API/
+│   └── Customer-Churn-Prediction-Starter/
+│       └── Customer-Churn-Prediction/
+│           ├── main.py
+│           ├── app.py
+│           ├── requirements.txt
+│           ├── .gitignore
+│           └── .env.example
 ├── Customer Churn.csv
 ├── Customer_Churn_Notebook.ipynb
 ├── README.md
-└── API/
-    ├── artifacts/
-    │   └── churnguard_pipeline.joblib
-    └── Customer-Churn-Prediction-Starter/
-        └── Customer-Churn-Prediction/
-            ├── main.py
-            ├── app.py
-            └── requirements.txt
+└── churnguard_pipeline.joblib
 
-10. How to Run the Project
+Note: The saved model is currently stored in the repository root. The API’s model-loading path must point to this location, or the model must be moved to the path expected by the code.
+
+10. How to Run the Project Locally
 
 Step 1: Install Dependencies
 
-Open a terminal in the application directory:
+Open a terminal in the API application directory:
 
 cd API/Customer-Churn-Prediction-Starter/Customer-Churn-Prediction
 
 Install the required packages:
 
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 
 Step 2: Start the FastAPI Backend
 
@@ -167,32 +172,38 @@ http://127.0.0.1:8000/health
 
 Step 3: Start the Streamlit Interface
 
-Open a second terminal in the same application directory and run:
+Open a second terminal in the same API application directory and run:
 
 python -m streamlit run app.py
 
-Streamlit will display the application URL in the terminal.
+Use the URL printed in the terminal to open the interface.
 
-Keep the FastAPI backend running while using the interface.
+Keep the FastAPI backend running while using Streamlit.
+
+Important Model Path Note
+
+The API must be able to locate churnguard_pipeline.joblib when it starts.
+
+Before running the project from a fresh clone, verify that the model-loading path in main.py matches the model’s actual location in the repository. The model file is currently stored in the repository root.
 
 11. Limitations
 
-* Predictions depend on the quality and representativeness of the training dataset.
-* Model performance may change when applied to new customer populations.
-* The estimated churn probability is not a guarantee of future customer behavior.
+* Predictions depend on the quality and representativeness of the training data.
+* Performance may vary when the model is applied to different customer populations.
+* Predicted probabilities are estimates, not guarantees of future customer behavior.
 * The model should be monitored and evaluated before being used for real business decisions.
 
 12. Future Improvements
 
 * Add model monitoring and performance tracking.
 * Improve explainability using feature importance or SHAP.
-* Add more robust input validation.
+* Expand automated testing.
 * Evaluate decision thresholds based on business requirements.
 * Deploy the application to a cloud platform.
-* Integrate automated testing and a reproducible training pipeline.
+* Build a reproducible model-training pipeline.
 
 13. Conclusion
 
-This project demonstrates an end-to-end Machine Learning workflow, from data exploration and preprocessing to model training, evaluation, API development, and interactive deployment.
+This project demonstrates an end-to-end Machine Learning workflow, from data exploration and preprocessing to model comparison, evaluation, model saving, API development, and an interactive user interface.
 
 It provides a practical example of applying Machine Learning to customer churn prediction.
