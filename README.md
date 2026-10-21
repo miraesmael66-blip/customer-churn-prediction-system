@@ -1,331 +1,316 @@
-📊 ChurnGuard AI | Customer Churn Prediction System
+<div align="center">
+
+📊 ChurnGuard AI
+
+Customer Churn Prediction System
 
 An End-to-End Machine Learning Project
 
-An end-to-end Machine Learning system designed to predict customer churn in the telecommunications industry using customer demographics, subscription information, and usage behavior.
+Predicting customer churn through data analysis, model comparison, hyperparameter tuning, and an interactive prediction system.
 
-The project combines data analysis, feature engineering, model comparison, hyperparameter tuning, and model evaluation with a FastAPI backend and Streamlit interface to deliver an interactive customer churn prediction system.
+Python
+Scikit-learn
+Pandas
+FastAPI
+Streamlit
 
-⸻
+</div>
 
-🎯 Project Overview
+────────
 
-Customer churn occurs when customers discontinue a service or switch to another provider. Predicting churn helps businesses identify customers at risk and make better retention decisions.
+📑 Table of Contents
 
-ChurnGuard AI uses Machine Learning classification models to identify potential churners based on customer data.
+• 🎯 Overview
+• ✨ Key Features
+• 📊 Dataset
+• 🔎 Exploratory Data Analysis
+• ⚙️ Data Preparation
+• 🤖 Models and Methodology
+• 📈 Model Comparison
+• 🏆 Final Model Evaluation
+• 🏗️ System Architecture
+• 🛠️ Tech Stack
+• 📂 Project Structure
+• 🚀 Setup and Usage
+• ⚠️ Limitations and Future Work
+• 👩‍💻 Author
 
-✨ Key Highlights
+────────
 
-* 📊 Exploratory Data Analysis (EDA)
-* 🧹 Data Cleaning and Preprocessing
-* ⚙️ Feature Engineering
-* 🤖 Training and Comparison of Multiple ML Models
-* 🔍 Hyperparameter Tuning using RandomizedSearchCV
-* 📈 Evaluation using Multiple Classification Metrics
-* 💾 Model Serialization using Joblib
-* 🚀 REST API Development using FastAPI
-* 🖥️ Interactive Prediction Interface using Streamlit
+🎯 Overview
 
-⸻
+Customer churn happens when customers stop using a company’s services. Identifying customers who may churn can help businesses understand customer behavior and make more informed retention decisions.
 
-📂 Dataset Overview
+ChurnGuard AI is a Machine Learning project that analyzes telecommunications customer data and predicts whether a customer is likely to churn. The workflow covers exploratory data analysis, data cleaning, feature engineering, model comparison, hyperparameter optimization, and evaluation. The project also includes a FastAPI backend and a Streamlit interface for interactive predictions.
 
-The dataset contains telecommunications customer information, including subscription details, usage behavior, demographic attributes, and churn labels.
+✨ Key Features
 
-Dataset Information	Value
-Original Records	3,150
-Original Features	14
-Target Variable	Churn
-Churned Customers	495
-Non-Churned Customers	2,655
-Churn Rate	~15.71%
-Records Retained After Preprocessing	2,822
+• 📊 Exploratory Data Analysis (EDA) and customer behavior analysis
+• 🧹 Duplicate investigation and data cleaning
+• ⚙️ Feature engineering with Avg_Usage_Duration
+• 🤖 Comparison of Logistic Regression, Random Forest, and Gradient Boosting
+• 🔍 Stratified 5-fold cross-validation
+• 🎛️ Random Forest hyperparameter tuning with RandomizedSearchCV
+• 📈 Evaluation with Precision, Recall, F1-score, ROC-AUC, and PR-AUC
+• 💾 Saving the selected model with Joblib
+• ⚡ FastAPI backend and Streamlit interface for predictions
 
-⚠️ Class Imbalance
+📊 Dataset
 
-The dataset contains fewer churned customers than non-churned customers.
+The dataset contains telecommunications customer information, usage behavior, and the target label Churn.
 
-Therefore, accuracy alone is insufficient to evaluate the model. Precision, Recall, F1-score, and PR-AUC are also considered to provide a more informative evaluation.
+|Dataset Detail                                         |Value                           |
+|-------------------------------------------------------|-------------------------------:|
+|Original rows                                          |3,150                           |
+|Original columns                                       |14                              |
+|Missing values                                         |0                               |
+|Exact duplicate rows initially identified              |300                             |
+|Rows after duplicate/conflicting-label cleaning        |2,822                           |
+|Features used before excluding `Status` for final model|14, including engineered feature|
+|Target                                                 |`Churn`                         |
 
-⸻
+Target Distribution
 
-🔬 Data Preprocessing & Feature Engineering
+|Churn label|Meaning|Original records|Percentage|
+|----------:|-------|---------------:|---------:|
+|`0`        |Stayed |2,655           |84.29%    |
+|`1`        |Churned|495             |15.71%    |
 
-The preprocessing workflow focuses on improving data quality and preparing meaningful features for Machine Learning.
+The target classes are imbalanced, so accuracy is not used as the only measure of model quality.
 
-🧹 Data Cleaning
+🔎 Exploratory Data Analysis
 
-* Explored feature distributions and relationships.
-* Checked for missing values and duplicate records.
-* Removed duplicate records.
-* Handled records with identical feature values but conflicting target labels.
+The notebook explores customer behavior and its relationship with churn, including:
 
-⚙️ Feature Engineering
+• Churn distribution
+• Complaints and churn rate
+• Subscription length
+• Usage behavior: seconds of use, frequency of use, and SMS frequency
+• Customer value
+• Age group and tariff plan
+• Customer status and churn
+• Feature correlations
+• Duplicate records and data-quality checks
 
-Created a new feature called Avg_Usage_Duration to represent average usage duration per usage frequency.
+Example Finding: Complaints
 
-Formula:
+|Complaint status  |Customers|Churned customers|Churn rate|
+|------------------|--------:|----------------:|---------:|
+|No complaint (`0`)|2,909    |295              |10.14%    |
+|Complaint (`1`)   |241      |200              |82.99%    |
 
-Avg_Usage_Duration = Seconds of Use / (Frequency of use + 1)
+In this dataset, customers with complaints have a substantially higher observed churn rate. This is an association in the data, not proof that complaints alone cause churn.
 
-📌 Data Splitting
+⚙️ Data Preparation
 
-The dataset was split into training and testing sets using stratification to preserve the target-class distribution.
+1. Data Quality Checks
 
-After preprocessing, 2,822 records were retained.
+• Checked missing values and found none in the original dataset.
+• Investigated exact duplicate rows.
+• Checked for identical feature combinations associated with conflicting churn labels.
+• Removed exact duplicates and excluded conflicting feature groups from the cleaned modeling dataset.
 
-⸻
+2. Feature Engineering
 
-🤖 Machine Learning Models
+Created Avg_Usage_Duration to represent average usage duration per usage frequency:
 
-Three classification algorithms were evaluated to identify the most suitable model for the churn prediction task.
+```python
+Avg_Usage_Duration = Seconds_of_Use / (Frequency_of_use + 1)
+```
 
-Model	Description
-Logistic Regression	Linear classification baseline
-Random Forest	Ensemble of decision trees
-Gradient Boosting	Sequential boosting-based ensemble
+The + 1 avoids division by zero when frequency is zero.
 
-🏆 Final Model Selection
+3. Train/Test Split
 
-Random Forest was selected following model comparison and hyperparameter tuning.
+A stratified split was used to preserve the target distribution:
 
-The Status feature was excluded from the final model to avoid relying on a potentially problematic or overly predictive feature.
+|Split               |Records|
+|--------------------|------:|
+|Training set        |2,257  |
+|Test set            |565    |
+|Total after cleaning|2,822  |
 
-🔍 Hyperparameter Optimization
+The notebook also checked for overlapping feature rows between the training and test sets; no overlap was found in that check.
 
-RandomizedSearchCV was used with stratified cross-validation to search for a suitable hyperparameter configuration.
+4. Feature Review
 
-Selected Hyperparameters
+A feature ablation experiment compared Random Forest performance with and without Status. The final tuned model excludes Status.
 
-Parameter	Value
-n_estimators	300
-max_depth	30
-min_samples_split	5
-min_samples_leaf	2
-max_features	sqrt
+🤖 Models and Methodology
 
-⸻
+Three classification models were evaluated using stratified 5-fold cross-validation.
 
-📈 Final Model Performance
+|Model              |Role                        |
+|-------------------|----------------------------|
+|Logistic Regression|Linear baseline model       |
+|Random Forest      |Tree-based ensemble model   |
+|Gradient Boosting  |Sequential boosting ensemble|
 
-The final Random Forest model was evaluated on a held-out test set.
+Hyperparameter Tuning
 
-📊 Evaluation Metrics
+RandomizedSearchCV was used to tune the Random Forest pipeline without the Status feature. The search evaluated 20 sampled parameter combinations using stratified 5-fold cross-validation and F1-score as the selection metric.
 
-Metric	Score
-Accuracy	94.87%
-Precision	83.53%
-Recall	82.56%
-F1-score	83.04%
-PR-AUC	91.33%
+Best parameters found:
 
-🔎 Confusion Matrix
+|Parameter                     |Selected value|
+|------------------------------|-------------:|
+|`n_estimators`                |`300`         |
+|`max_depth`                   |`30`          |
+|`min_samples_split`           |`5`           |
+|`min_samples_leaf`            |`2`           |
+|`max_features`                |`sqrt`        |
+|Best cross-validation F1-score|`0.8618`      |
 
-Actual / Predicted	No Churn	Churn
-Actual No Churn	465	14
-Actual Churn	15	71
+📈 Model Comparison
 
-💡 Interpreting the Results
+Mean cross-validation scores from the notebook:
 
-* Accuracy: Measures the proportion of all test predictions that were correct.
-* Precision: Measures how many customers predicted to churn actually churned.
-* Recall: Measures how many actual churners were correctly identified.
-* F1-score: Balances Precision and Recall.
-* PR-AUC: Summarizes the precision-recall trade-off across classification thresholds.
+|Model                                 |Accuracy|Precision|Recall|F1-score|ROC-AUC|PR-AUC|
+|--------------------------------------|-------:|--------:|-----:|-------:|------:|-----:|
+|Logistic Regression                   |0.8343  |0.4778   |0.8641|0.6152  |0.9290 |0.7454|
+|Random Forest                         |0.9637  |0.9431   |0.8122|0.8725  |0.9904 |0.9561|
+|Gradient Boosting                     |0.9522  |0.9083   |0.7659|0.8306  |0.9821 |0.9273|
+|Tuned Random Forest (without `Status`)|0.9592  |0.8948   |0.8324|0.8618  |0.9860 |0.9234|
 
-The model correctly identified 71 out of 86 customers who churned in the test set.
+The first three rows show the initial model comparison. The tuned Random Forest row reports the separate cross-validation evaluation of the selected tuned estimator without Status.
 
-Using multiple evaluation metrics provides a more complete understanding of model performance than accuracy alone, especially when working with imbalanced data.
+🏆 Final Model Evaluation
 
-⸻
+The tuned Random Forest model was evaluated on the held-out test set of 565 records.
+
+Test Set Metrics
+
+|Metric   |Score |
+|---------|-----:|
+|Accuracy |94.87%|
+|Precision|83.53%|
+|Recall   |82.56%|
+|F1-score |83.04%|
+|PR-AUC   |91.33%|
+
+Confusion Matrix
+
+|Actual / Predicted|Stayed (`0`)|Churned (`1`)|
+|------------------|-----------:|------------:|
+|Stayed (`0`)      |465         |14           |
+|Churned (`1`)     |15          |71           |
+
+What These Results Mean
+
+• Precision (83.53%): Of the customers predicted to churn, about 83.53% actually churned.
+• Recall (82.56%): The model identified 71 of the 86 customers who churned in the test set.
+• F1-score (83.04%): Balances precision and recall.
+• PR-AUC (91.33%): Summarizes the precision-recall trade-off across thresholds and is useful for an imbalanced classification problem.
+
+The model’s predictions are estimates and should be interpreted alongside business context and ongoing validation.
 
 🏗️ System Architecture
 
-ChurnGuard AI combines three main components to support the complete Machine Learning workflow.
+The project consists of three main parts:
 
-1. 📓 Jupyter Notebook — ML Pipeline
+|Component       |Responsibility                                                                             |
+|----------------|-------------------------------------------------------------------------------------------|
+|Jupyter Notebook|EDA, preprocessing, feature engineering, training, tuning, and evaluation                  |
+|FastAPI         |Serves prediction endpoints and validates incoming request data                            |
+|Streamlit       |Provides an interactive interface for entering customer information and viewing predictions|
 
-Responsible for:
+The selected model pipeline is serialized with Joblib for reuse by the prediction application.
 
-* Exploratory Data Analysis
-* Data Cleaning and Preprocessing
-* Feature Engineering
-* Model Training and Comparison
-* Hyperparameter Tuning
-* Model Evaluation
+🛠️ Tech Stack
 
-Main file: Customer_Churn_Notebook.ipynb
+|Area                |Tools              |
+|--------------------|-------------------|
+|Language            |Python             |
+|Data handling       |Pandas, NumPy      |
+|Visualization       |Matplotlib, Seaborn|
+|Machine Learning    |Scikit-learn       |
+|Model persistence   |Joblib             |
+|API                 |FastAPI, Uvicorn   |
+|User interface      |Streamlit          |
+|Notebook environment|Jupyter Notebook   |
 
-2. ⚡ FastAPI — Backend
+📂 Project Structure
 
-The API provides the prediction functionality.
-
-It is responsible for:
-
-* Loading the trained Machine Learning model.
-* Validating customer inputs.
-* Calculating the engineered feature.
-* Returning churn predictions and estimated churn probabilities.
-
-3. 🖥️ Streamlit — Frontend
-
-The interactive interface allows users to:
-
-* Enter customer information.
-* Submit customer data for prediction.
-* View the prediction results.
-
-The Streamlit application communicates with the FastAPI backend.
-
-⸻
-
-🛠️ Technologies & Tools
-
-Category	Technologies
-Programming Language	Python
-Data Manipulation	Pandas, NumPy
-Data Visualization	Matplotlib, Seaborn
-Machine Learning	Scikit-learn
-Model Serialization	Joblib
-Backend API	FastAPI
-API Server	Uvicorn
-Frontend Interface	Streamlit
-HTTP Requests	Requests
-Development Environment	Jupyter Notebook
-
-⸻
-
-📁 Project Structure
-
+```text
 customer-churn-prediction-system/
-│
 ├── API/
 │   └── Customer-Churn-Prediction-Starter/
 │       └── Customer-Churn-Prediction/
 │           ├── main.py
 │           ├── app.py
 │           ├── requirements.txt
-│           ├── .gitignore
-│           └── .env.example
-│
+│           ├── .env.example
+│           └── .gitignore
 ├── Customer Churn.csv
 ├── Customer_Churn_Notebook.ipynb
-├── churnguard_pipeline.joblib
+├── models/
+│   └── churnguard_pipeline.joblib
 └── README.md
+```
 
-📌 Main Components
+The tree illustrates the main files and expected model-artifact location; adjust folder names if your repository layout differs.
 
-File	Purpose
-Customer Churn.csv	Original dataset
-Customer_Churn_Notebook.ipynb	Analysis, training, and evaluation
-churnguard_pipeline.joblib	Serialized trained model pipeline
-main.py	FastAPI backend
-app.py	Streamlit frontend
-requirements.txt	Python dependencies
-README.md	Project documentation
+🚀 Setup and Usage
 
-⸻
+1. Clone the repository
 
-🚀 Installation & Setup
-
-Follow these steps to run the project locally.
-
-Prerequisites
-
-* Python installed
-* pip package manager
-* Git
-
-1️⃣ Clone the Repository
-
+```bash
 git clone https://github.com/miraesmael66-blip/customer-churn-prediction-system.git
-
-Navigate to the project directory:
-
 cd customer-churn-prediction-system
+```
 
-2️⃣ Install Dependencies
+2. Install dependencies
 
-Navigate to the API application directory:
+Open a terminal in the API application directory (the directory containing requirements.txt):
 
-cd API/Customer-Churn-Prediction-Starter/Customer-Churn-Prediction
-
-Install the required packages:
-
+```bash
 python -m pip install -r requirements.txt
+```
 
-3️⃣ Start the FastAPI Backend
+3. Run the FastAPI backend
 
-Run the following command from the API application directory:
+From the directory containing main.py, run:
 
+```bash
 python -m uvicorn main:app --reload
+```
 
-The API will be available at:
+Then open the interactive API documentation:
 
-http://127.0.0.1:8000
-
-Available API Pages
-
-Endpoint	Purpose
-/docs	Interactive API documentation
-/health	API health check
-
-Open the interactive documentation at:
-
+```text
 http://127.0.0.1:8000/docs
+```
 
-Check the API health at:
+Health-check endpoint:
 
+```text
 http://127.0.0.1:8000/health
+```
 
-4️⃣ Start the Streamlit Interface
+4. Run the Streamlit interface
 
-Open a second terminal and navigate to the same API application directory.
+Open a second terminal in the directory containing app.py and run:
 
-Run:
-
+```bash
 python -m streamlit run app.py
+```
 
-Open the URL displayed in the terminal to access the interface.
+Keep the FastAPI backend running while using the Streamlit interface. Ensure the model path configured in the backend points to the saved churnguard_pipeline.joblib file.
 
-Important: Keep the FastAPI backend running while using the Streamlit application.
+⚠️ Limitations and Future Work
 
-⚠️ Model File Path
-
-The trained model file, churnguard_pipeline.joblib, is currently stored in the repository root.
-
-Ensure that the model-loading path in main.py correctly points to the file’s actual location when running the project from a fresh clone.
-
-⸻
-
-⚠️ Limitations
-
-* Predictions depend on the quality and representativeness of the training data.
-* Model performance may vary across different customer populations.
-* Predicted probabilities are estimates, not guarantees of future customer behavior.
-* Further monitoring and evaluation are necessary before using the model for real business decisions.
-
-⸻
-
-🔮 Future Improvements
-
-Potential future enhancements include:
-
-* 📊 Model monitoring and performance tracking.
-* 🔄 Periodic model retraining with updated customer data.
-* ☁️ Cloud deployment for broader accessibility.
-* 📈 Additional analytics to support customer retention strategies.
-
-⸻
+• The dataset is relatively small and may not represent every telecom customer population.
+• Churn classes are imbalanced; model quality should be assessed using multiple metrics.
+• Performance may change on new data, so external validation and monitoring would be needed before production use.
+• Future work could include deployment to a cloud platform, monitoring, periodic retraining, and further threshold optimization based on business needs.
 
 👩‍💻 Author
 
 Amira Esmail
-
 Machine Learning | Artificial Intelligence | Data Analysis
 
 🔗 GitHub Profile
 
-⸻
+────────
 
-⭐ If you find this project interesting, consider giving the repository a star!
+⭐ If you find this project useful, feel free to star the repository!
